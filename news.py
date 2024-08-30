@@ -83,6 +83,6 @@ if uploaded_file is not None and api_key:
                     st.error(f"エラーが発生しました: {str(e)}")
 
 elif not api_key:
-    st.warning("サイドバーでGemini APIキーを入力してください。")
+    st.warning("サイドバーからGemini APIキーを入力してください。")
 else:
     st.info("記事を生成するには、まずファイルをアップロードしてください。")
