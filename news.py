@@ -29,7 +29,6 @@ with st.sidebar:
 uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx"])
 
 # 記事設定をメインに配置
-st.header("記事設定")
 newspaper_style = st.selectbox("新聞社の文体を選択", newspapers)
 if newspaper_style == "その他（自由入力）":
     newspaper_style = st.text_input("新聞社名を入力")
