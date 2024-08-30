@@ -9,10 +9,10 @@ from docx import Document
 # Load environment variables
 load_dotenv()
 
-# 新聞社のリスト (文字列として正しく定義)
-newspapers = ["朝日新聞", "読売新聞", "毎日新聞", "日本経済新聞", "産経新聞", "その他（自由入力）"]
+# 記事の文体リスト (より一般的なスタイル)
+styles = ["ですます調", "である調", "ニュースレポート", "カジュアル", "フォーマル"]
 
-st.title("📰 新聞風記事生成アプリ")
+st.title("📰 記事生成アプリ")
 
 # サイドバーでAPIキーを入力
 with st.sidebar:
@@ -29,9 +29,8 @@ with st.sidebar:
 uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx"])
 
 # 記事設定をメインに配置
-newspaper_style = st.selectbox("新聞社の文体を選択", newspapers)
-if newspaper_style == "その他（自由入力）":
-    newspaper_style = st.text_input("新聞社名を入力")
+st.header("記事設定")
+writing_style = st.selectbox("記事の文体を選択", styles)
 
 word_count = st.number_input("目標文字数", min_value=100, max_value=1000, value=int(os.getenv("DEFAULT_WORD_COUNT", 300)), step=50)
 
@@ -62,7 +61,7 @@ if uploaded_file is not None and api_key:
         if st.button("記事を生成"):
             with st.spinner("記事を生成中..."):
                 prompt = f"""
-                以下の内容を{newspaper_style}の文体で、約{word_count}文字の記事にまとめてください。
+                以下の内容を「{writing_style}」の文体で、約{word_count}文字の記事にまとめてください。
                 言語: {language}
 
                 内容:
