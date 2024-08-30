@@ -59,7 +59,7 @@ def read_file_content(file):
 
 @retry.Retry()
 def generate_content(prompt):
-    model = genai.GenerativeModel('gemini-pro-1.5')
+    model = genai.GenerativeModel('gemini-pro')
     response = model.generate_content(prompt)
     return response.text
 
