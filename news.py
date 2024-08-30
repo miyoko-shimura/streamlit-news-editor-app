@@ -17,6 +17,9 @@ newspapers = ["朝日新聞", "読売新聞", "毎日新聞", "日本経済新�
 
 st.title("📰 新聞風記事生成アプリ")
 
+# ファイルアップローダーを一番上に配置
+uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx"])
+
 # 設定
 st.header("設定")
 newspaper_style = st.selectbox("新聞社の文体を選択", newspapers)
@@ -24,10 +27,11 @@ if newspaper_style == "その他（自由入力）":
     newspaper_style = st.text_input("新聞社名を入力")
 
 word_count = st.number_input("目標文字数", min_value=100, max_value=1000, value=int(os.getenv("DEFAULT_WORD_COUNT", 300)), step=50)
-language = st.radio("言語を選択", ["日本語", "English"], index=0 if os.getenv("DEFAULT_LANGUAGE", "日本語") == "日本語" else 1)
 
-# ファイルアップローダー
-uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx"])
+# 言語の選択肢に中国語、韓国語、ポルトガル語、タガログ語を追加
+language_options = ["日本語", "English", "中文", "한국어", "Português", "Tagalog"]
+default_language = os.getenv("DEFAULT_LANGUAGE", "日本語")
+language = st.radio("言語を選択", language_options, index=language_options.index(default_language) if default_language in language_options else 0)
 
 def read_file_content(file):
     if file.type == "text/plain":
@@ -52,7 +56,7 @@ if uploaded_file is not None:
             with st.spinner("記事を生成中..."):
                 prompt = f"""
                 以下の内容を{newspaper_style}の文体で、約{word_count}文字の記事にまとめてください。
-                言語: {'日本語' if language == '日本語' else '英語'}
+                言語: {language}
 
                 内容:
                 {file_contents}
