@@ -57,6 +57,12 @@ def read_file_content(file):
         st.error("Unsupported file type")
         return None
 
+@retry.Retry()
+def generate_content(prompt):
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content(prompt)
+    return response.text
+
 if uploaded_file is not None and api_key:
     # ファイルの内容を読み込む
     file_contents = read_file_content(uploaded_file)
@@ -65,31 +71,38 @@ if uploaded_file is not None and api_key:
 
         if st.button("記事を生成"):
             with st.spinner("記事を生成中..."):
-                prompt = f"""
-                Task: Summarize the following content into an article.
+                # Step 1: Generate summary in English
+                english_prompt = f"""
+                Summarize the following content into an article.
                 Style: {writing_style}
                 Target word count: Approximately {word_count} words
-                Language: {language_options[selected_language]}
-
-                Important: The entire output must be in {language_options[selected_language]}.
 
                 Content to summarize:
                 {file_contents}
 
-                Please generate the article now:
+                Please generate the article in English:
                 """
 
-                # Gemini APIを使用して記事を生成
-                @retry.Retry()
-                def generate_article():
-                    model = genai.GenerativeModel('gemini-pro')
-                    response = model.generate_content(prompt)
-                    return response.text
-
                 try:
-                    generated_article = generate_article()
+                    english_article = generate_content(english_prompt)
+
+                    # Step 2: Translate to the target language if not English
+                    if language_options[selected_language] != "English":
+                        translation_prompt = f"""
+                        Translate the following English text to {language_options[selected_language]}.
+                        Maintain the original style and tone as much as possible.
+
+                        Text to translate:
+                        {english_article}
+
+                        Translated text in {language_options[selected_language]}:
+                        """
+                        translated_article = generate_content(translation_prompt)
+                    else:
+                        translated_article = english_article
+
                     st.subheader("生成された記事")
-                    st.markdown(generated_article)
+                    st.markdown(translated_article)
                 except Exception as e:
                     st.error(f"エラーが発生しました: {str(e)}")
 
