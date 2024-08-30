@@ -17,15 +17,14 @@ newspapers = ["朝日新聞", "読売新聞", "毎日新聞", "日本経済新�
 
 st.title("📰 新聞風記事生成アプリ")
 
-# サイドバーの設定
-with st.sidebar:
-    st.header("設定")
-    newspaper_style = st.selectbox("新聞社の文体を選択", newspapers)
-    if newspaper_style == "その他（自由入力）":
-        newspaper_style = st.text_input("新聞社名を入力")
-    
-    word_count = st.number_input("目標文字数", min_value=100, max_value=1000, value=int(os.getenv("DEFAULT_WORD_COUNT", 300)), step=50)
-    language = st.radio("言語を選択", ["日本語", "English"], index=0 if os.getenv("DEFAULT_LANGUAGE", "日本語") == "日本語" else 1)
+# 設定
+st.header("設定")
+newspaper_style = st.selectbox("新聞社の文体を選択", newspapers)
+if newspaper_style == "その他（自由入力）":
+    newspaper_style = st.text_input("新聞社名を入力")
+
+word_count = st.number_input("目標文字数", min_value=100, max_value=1000, value=int(os.getenv("DEFAULT_WORD_COUNT", 300)), step=50)
+language = st.radio("言語を選択", ["日本語", "English"], index=0 if os.getenv("DEFAULT_LANGUAGE", "日本語") == "日本語" else 1)
 
 # ファイルアップローダー
 uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx"])
