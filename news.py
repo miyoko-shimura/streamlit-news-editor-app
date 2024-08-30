@@ -9,9 +9,6 @@ from docx import Document
 # Load environment variables
 load_dotenv()
 
-# Gemini APIの設定
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
 # 新聞社のリスト (文字列として正しく定義)
 newspapers = ["朝日新聞", "読売新聞", "毎日新聞", "日本経済新聞", "産経新聞", "その他（自由入力）"]
 
@@ -20,17 +17,28 @@ st.title("📰 新聞風記事生成アプリ")
 # ファイルアップローダーを一番上に配置
 uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx"])
 
-# 設定
-newspaper_style = st.selectbox("新聞社の文体を選択", newspapers)
-if newspaper_style == "その他（自由入力）":
-    newspaper_style = st.text_input("新聞社名を入力")
+# サイドバーの設定
+with st.sidebar:
+    st.header("Gemini API 設定")
+    api_key = st.text_input("Gemini API キーを入力", type="password")
+    
+    if api_key:
+        # Gemini APIの設定
+        genai.configure(api_key=api_key)
+    else:
+        st.warning("APIキーを入力してください。")
 
-word_count = st.number_input("目標文字数", min_value=100, max_value=1000, value=int(os.getenv("DEFAULT_WORD_COUNT", 300)), step=50)
+    st.header("記事設定")
+    newspaper_style = st.selectbox("新聞社の文体を選択", newspapers)
+    if newspaper_style == "その他（自由入力）":
+        newspaper_style = st.text_input("新聞社名を入力")
+    
+    word_count = st.number_input("目標文字数", min_value=100, max_value=1000, value=int(os.getenv("DEFAULT_WORD_COUNT", 300)), step=50)
 
-# 言語の選択肢に中国語、韓国語、ポルトガル語、タガログ語を追加
-language_options = ["日本語", "English", "中文", "한국어", "Português", "Tagalog"]
-default_language = os.getenv("DEFAULT_LANGUAGE", "日本語")
-language = st.radio("言語を選択", language_options, index=language_options.index(default_language) if default_language in language_options else 0)
+    # 言語の選択肢に中国語、韓国語、ポルトガル語、タガログ語を追加
+    language_options = ["日本語", "English", "中文", "한국어", "Português", "Tagalog"]
+    default_language = os.getenv("DEFAULT_LANGUAGE", "日本語")
+    language = st.radio("言語を選択", language_options, index=language_options.index(default_language) if default_language in language_options else 0)
 
 def read_file_content(file):
     if file.type == "text/plain":
@@ -45,7 +53,7 @@ def read_file_content(file):
         st.error("Unsupported file type")
         return None
 
-if uploaded_file is not None:
+if uploaded_file is not None and api_key:
     # ファイルの内容を読み込む
     file_contents = read_file_content(uploaded_file)
     if file_contents:
@@ -64,7 +72,7 @@ if uploaded_file is not None:
                 # Gemini APIを使用して記事を生成
                 @retry.Retry()
                 def generate_article():
-                    model = genai.GenerativeModel('gemini-pro')
+                    model = genai.GenerativeModel('gemini-pro-1.5')
                     response = model.generate_content(prompt)
                     return response.text
 
@@ -75,5 +83,7 @@ if uploaded_file is not None:
                 except Exception as e:
                     st.error(f"エラーが発生しました: {str(e)}")
 
+elif not api_key:
+    st.warning("Gemini APIキーを入力してください。")
 else:
     st.info("記事を生成するには、まずファイルをアップロードしてください。")
