@@ -22,7 +22,7 @@ with st.sidebar:
         st.warning("APIキーを入力してください。")
 
 # ファイルアップローダーを一番上に配置
-uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx", "mp4", "mp3", "mov"])
+uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx"])
                                                       
 # 記事設定をメインに配置
 st.header("記事設定")
