@@ -21,7 +21,6 @@ st.title("📰 新聞風記事生成アプリ")
 uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt", "pdf", "docx"])
 
 # 設定
-st.header("設定")
 newspaper_style = st.selectbox("新聞社の文体を選択", newspapers)
 if newspaper_style == "その他（自由入力）":
     newspaper_style = st.text_input("新聞社名を入力")
