@@ -34,13 +34,13 @@ word_count = st.number_input("目標文字数", min_value=100, max_value=1000, v
 
 # 言語の選択肢と言語コードのマッピング
 language_options = {
-    "日本語": "ja",
-    "English": "en",
-    "中文 (简体)": "zh-CN",
-    "中文 (繁體)": "zh-TW",
-    "한국어": "ko",
-    "Português": "pt",
-    "Tagalog": "tl"
+    "日本語": "Japanese",
+    "English": "English",
+    "中文 (简体)": "Simplified Chinese",
+    "中文 (繁體)": "Traditional Chinese",
+    "한국어": "Korean",
+    "Português": "Portuguese",
+    "Tagalog": "Tagalog"
 }
 selected_language = st.selectbox("言語を選択", list(language_options.keys()))
 
@@ -66,11 +66,17 @@ if uploaded_file is not None and api_key:
         if st.button("記事を生成"):
             with st.spinner("記事を生成中..."):
                 prompt = f"""
-                以下の内容を「{writing_style}」の文体で、約{word_count}文字の記事にまとめてください。
-                言語: {selected_language}
+                Task: Summarize the following content into an article.
+                Style: {writing_style}
+                Target word count: Approximately {word_count} words
+                Language: {language_options[selected_language]}
 
-                内容:
+                Important: The entire output must be in {language_options[selected_language]}.
+
+                Content to summarize:
                 {file_contents}
+
+                Please generate the article now:
                 """
 
                 # Gemini APIを使用して記事を生成
@@ -83,7 +89,7 @@ if uploaded_file is not None and api_key:
                 try:
                     generated_article = generate_article()
                     st.subheader("生成された記事")
-                    st.markdown(generated_article)  # markdownを使用して表示
+                    st.markdown(generated_article)
                 except Exception as e:
                     st.error(f"エラーが発生しました: {str(e)}")
 
