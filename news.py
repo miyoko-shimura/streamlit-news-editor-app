@@ -58,7 +58,7 @@ if uploaded_file is not None and api_key:
             with st.spinner("記事を生成中..."):
                 prompt = f"""
                 以下の内容を「{writing_style}」の文体で、約{word_count}文字の記事にまとめてください。
-                言語: {language}
+                この言語に翻訳してください: {language}
 
                 内容:
                 {file_contents}
