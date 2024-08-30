@@ -1,16 +1,11 @@
 import streamlit as st
 import google.generativeai as genai
 from google.api_core import retry
-import os
-from dotenv import load_dotenv
 import PyPDF2
 from docx import Document
 
-# Load environment variables
-load_dotenv()
-
 # 記事の文体リスト (より一般的なスタイル)
-styles = ["ですます調", "である調", "ニュースレポート", "カジュアル", "フォーマル"]
+styles = ["ですます調", "である調", "ニュースレポート", "カジュアル", "フォーマル", "その他（自由入力）"]
 
 st.title("📰 文章生成アプリ")
 
@@ -31,13 +26,14 @@ uploaded_file = st.file_uploader("ファイルをアップロード", type=["txt
 # 記事設定をメインに配置
 st.header("記事設定")
 writing_style = st.selectbox("記事の文体を選択", styles)
+if writing_style == "その他（自由入力）":
+    writing_style = st.text_input("文体を入力してください")
 
-word_count = st.number_input("目標文字数", min_value=100, max_value=1000, value=int(os.getenv("DEFAULT_WORD_COUNT", 300)), step=50)
+word_count = st.number_input("目標文字数", min_value=100, max_value=1000, value=300, step=50)
 
 # 言語の選択肢に中国語、韓国語、ポルトガル語、タガログ語を追加
 language_options = ["日本語", "English", "中文", "한국어", "Português", "Tagalog"]
-default_language = os.getenv("DEFAULT_LANGUAGE", "日本語")
-language = st.radio("言語を選択", language_options, index=language_options.index(default_language) if default_language in language_options else 0)
+language = st.radio("言語を選択", language_options)
 
 def read_file_content(file):
     if file.type == "text/plain":
@@ -71,7 +67,7 @@ if uploaded_file is not None and api_key:
                 # Gemini APIを使用して記事を生成
                 @retry.Retry()
                 def generate_article():
-                    model = genai.GenerativeModel('gemini-pro-1.5')
+                    model = genai.GenerativeModel('gemini-pro')
                     response = model.generate_content(prompt)
                     return response.text
 
